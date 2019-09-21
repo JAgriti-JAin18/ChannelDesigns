@@ -1,0 +1,97 @@
+#include <iostream>
+#include <math.h>
+using namespace std;
+int main()
+{
+	float w,d1,d2,a,b,p,v,qr,qc,s1,s2,n,r,s;
+	float charea(float w, float d1, float d2, float s1, float s2, float b);
+	float chperi(float w, float d1, float d2, float s1, float s2, float b);
+	float chvel(float n,float r,float s);
+	char chty,stc;
+	cout<<"Enter the discharge in cumec\n";
+	cin>>qr;
+	B: cout<<"Enter the Channel type, l for lined & u for unlined \n";
+	cin>>chty;
+	if (chty!='l'&& chty!='u')
+	{
+		cout<<"Wrong Input, Please enter again \n";
+		goto B;
+	}
+	C: cout<<"Enter the site conditions, e for excavation & f for filling \n";
+	cin>>stc;
+	if (stc!='e'&& stc!='f')
+	{
+		cout<<"Wrong Input, Please enter again \n";
+		goto C;
+	}
+	if (chty=='l'&&stc=='e')
+	s1=1.0;
+	else if (chty=='l'&&stc=='f')
+	s1=1.5;
+	else if (chty=='u'&&stc=='e')
+	s1=1.5;
+	else
+	s1=2.0;
+	if (chty=='l')
+	s2=1.0;
+	else
+	s2=1.5;
+	
+	b=1.5;
+	n=0.018;
+	s=1.0/5000.0;
+	qc=0.0;
+	for(d1=0.001;qc<qr;d1=d1+0.001)
+	{
+		w=2.0*d1;
+		d2=d1/2.0; //d1 is the total depth of the section and d2 is the depth of bottom trapezoid in case of composite trapezoid
+		a=charea(w,d1,d2,s1,s2,b);
+		p=chperi(w,d1,d2,s1,s2,b);
+		r=a/p;
+		v=chvel(n,r,s);
+		qc=a*v;
+	}	
+		cout<<"The depth of the channel in m is " <<d1;
+		cout<<"\nThe width of the channel in m is " <<w;
+		if (d1<=2.0)
+		cout<<"\nThe section is rectangular";
+		else if (d1<=4.0)
+		cout<<"\nThe secton is trapezoidal";
+		else
+		cout<<"\nThe section is composite trapezoidal";	
+	
+}
+	float charea(float w, float d1, float d2, float s1, float s2, float b)
+	{
+	float a;
+	if (d1<=2.0)
+		a=w*d1;
+		else if (d1<=4.0)
+		a=(w+(s2*d1))*d1;
+		else 
+		a=d2*(w+(s2*d2))+(d1-d2)*(((2*b)+w)+s1*(d1-d2));
+	return a;
+	}
+
+	float chperi(float w, float d1, float d2, float s1, float s2, float b)
+	{
+	float p;
+	if (d1<=2.0)
+		{
+			p=w+(2.0*d1);
+		}
+		else if (d1<=4.0)
+		{
+		p=(w+(2.0*d1))*sqrt(1.0+(pow(s2,2.0)));
+		}
+		else 
+		p=w+(2*b)+(2*(d1-d2))*sqrt(1.0+(pow(s1,2.0)))+(2*d2)*sqrt(1.0+(pow(s2,2.0)));
+	return p;
+	}
+
+	float chvel(float n,float r,float s)
+	{
+	float v;
+	v=(1.0/n)*pow(r,2.0/3.0)*pow(s,1.0/2.0);
+	return v;
+	}
